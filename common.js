@@ -1,0 +1,3 @@
+funcion test(){
+	alert('test');
+}
