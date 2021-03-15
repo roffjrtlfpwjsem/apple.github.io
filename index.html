@@ -2,35 +2,199 @@
 <html lang="ko">
 	<head>
 		<meta charset="utf-8">
-		<title>[페이지 제목]</title>
+		<title>비아눈나</title>
 		<link rel="stylesheet" type="text/css" href="./css/common.css">
+		<script type="text/javascript" src="./js/jquery-3.4.1.min.js"></script>
 		<script type="text/javascript" src="./js/common.js"></script>
+		<script type="text/javascript">
+	        let chars = "QWEASD";
+	        let textLeng = 0;
+	        let inputCnt = 0;
+	        let movTime = 2000;
+	        let arrRandText = new Array();
+	        let divCont = "";
+	        let timerFlag = false;
+
+	        let motionTime = 4000;
+
+	        $( document ).ready( function() {
+	            resetVal();
+	        });
+
+	        function resetVal() {
+	            textLeng = 7;
+	            timerFlag = false;
+	            inputCnt = 0;
+	            arrRandText = [];
+	            divCont = "<div style=''>";
+
+	            for(let i = 0 ; i<textLeng ; i++) {
+	                if(i == 0) {
+	                    divCont += "<span id='ranText_" + i + "' class='biakiss-span hit'></span>";
+	                } else {
+	                    divCont += "<span id='ranText_" + i + "' class='biakiss-span ready'></span>";
+	                }
+	            }
+	            divCont += "</div><div id='progressDiv'><div id='viewSec'></div><progress id='progressbar' value='100' max='100'></progress></div><div id='msg'></div>";
+	            $("#container").html( divCont );
+
+	            genText(textLeng);
+	            for(let i = 0 ; i<textLeng ; i++) {
+	                $("#ranText_"+i).text( arrRandText[i] );
+	            }
+
+	            timeBar();
+	        }
+
+	        function genText(j) {
+	            for(let i = 0 ; i<j ; i++) {
+	                var rnum = Math.floor(Math.random() * chars.length);
+	                arrRandText[i] = chars.substring(rnum,rnum+1);
+	            }
+	        }
+
+	        function returnResult(v) {
+	            if(v) {
+	                $("#msg").text("SUCCESS");      
+	                clearInterval(animate);
+	            } else {
+	                //$("#ranText_"+inputCnt).attr( "class","wrong" );
+	                $("#msg").text("FAILURE");
+	                clearInterval(animate);
+	            }
+	            timerFlag = true;
+	            setTimeout( resetVal, movTime);
+	        }
+
+	        $(document).keyup(function(event) {
+	            if(event.keyCode >= 65 && event.keyCode <=90 )
+	            if(inputCnt <= textLeng && timerFlag == false) {
+	                let valInput = String.fromCharCode(event.keyCode);
+	                if( arrRandText[inputCnt] == valInput ) {
+
+	                    $("#ranText_"+inputCnt).attr( "class","correct" );
+	                    $("#ranText_"+(inputCnt+1)).attr( "class","hit" );
+
+	                    if( inputCnt == (textLeng-1) ) {                    
+	                        returnResult(true);                 
+	                    } else {
+	                        ++inputCnt;
+	                    }               
+	                } else {
+	                    returnResult(false);
+	                }
+	            }
+	        });
+
+
+	        let animate;
+
+	        function timeBar() {
+	            let progressbar = $("#progressbar");
+	            let max = progressbar.attr("max");
+	            let time = motionTime/max;
+	            let value = progressbar.val();
+
+	            let motion = function(){
+	                value -= 1;
+	                addValue = progressbar.val(value);
+	                tmp = String(value*time/1000).substring(0,3);
+	                $("#viewSec").text( tmp + " 초");
+	                if(tmp <= 0) {
+	                    //alert(value)
+	                    returnResult(false)
+	                }
+	                if(value <= 0) {
+	                    clearInterval(animate);                 
+	                }
+	            }
+
+	            animate = setInterval(function() { motion(); }, time );
+	        }
+	    </script>
+
+		<style>
+			#container span {
+	            font-size:28px;
+	            display:inline-block;
+	            padding:5px;
+	            margin:5px;
+	            font-family:Arial;
+	            width:3.5rem;
+	        }
+	        #wrap {
+	            padding-top:10rem;
+	            width: 100%;
+	            display: -webkit-box;
+	            display: -ms-flexbox;
+	            display: flex;
+	            -webkit-box-align: center;
+	            -ms-flex-align: center;
+	            align-items: center;
+	            -webkit-box-pack: center;
+	            -ms-flex-pack: center;
+	            justify-content: center;
+	        }
+	        #container {
+	            font-weight:bold;
+	            text-align: center;
+	        }
+	        #msg {
+	            font-size:30px;
+	            color:red;
+	            text-align:center;
+	            margin-bottom:10px;
+	            height:50px;
+	            border:0;
+	        }
+	        #progressDiv {
+	            position: relative;
+	        }
+	        #progressbar {
+	            width:300px;
+	            height:40px;
+	            z-index:999;
+	        }
+	        #viewSec {
+	            font-size:13px;
+	            font-weight:normal;
+	            width: 100%;
+	            padding-top: .6rem;
+	            text-align: center;
+	            z-index:1;
+	            position: absolute;
+	            color:#000;
+	            text-shadow: -1px 0 #FFF, 0 1px #FFF, 1px 0 #FFF, 0 -1px #FFF;
+	        }
+	        .hit {
+	            color:#ff8000;
+	            background-color:white;
+	            border:solid 4px #ff8000;
+	        }
+	        .ready {
+	            color:#404040;
+	            background-color:white;
+	            border:solid 4px #404040;
+	        }
+	        .correct {
+	            background-color:#808080;
+	            border:solid 4px #404040;
+	        }
+		</style>
 	</head>
 	<body>
-		<header>
-			<h1>[사이트 제목]</h1>
-			<h2>[사이트 부제목]</h2>
-			<nav>
-				<ul>
-					<li>[메뉴1]</li>
-					<li>[메뉴2]</li>
-					<li>[메뉴3]</li>
-				</ul>
-			</nav>
-		</header>
-		<main>
-			<article>
-				<p>[본문 내용]</p>
-			</article>
-		</main>
-		<aside>
-			[사이드바 내용]
-		</aside>
-		<div onclick='test()' class="test-css">
-			js 동작 css 연결테스트
+		<div id="wrap">
+		    <div id="container" style="background-color: #fff;">
+		        <div style="">
+		            <span id="ranText_0" class="biakiss-span hit">A</span><span id="ranText_1" class="biakiss-span ready">Q</span><span id="ranText_2" class="biakiss-span ready">Q</span><span id="ranText_3" class="biakiss-span ready">E</span>
+		            <span id="ranText_4" class="biakiss-span ready">E</span><span id="ranText_5" class="biakiss-span ready">S</span><span id="ranText_6" class="biakiss-span ready">A</span>
+		        </div>
+		        <div id="progressDiv">
+		            <div id="viewSec">2.5 초</div>
+		            <progress id="progressbar" value="63" max="100"></progress>
+		        </div>
+		        <div id="msg"></div>
+		    </div>
 		</div>
-		<footer>
-			<address>[주소 내용]</address>
-		</footer>
 	</body>
 </html>
